@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:dumdumcard/pages/menu.dart';
 import 'package:dumdumcard/pages/loading.dart';
+import 'package:dumdumcard/pages/screen.dart';
 
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute: './menu',
+    initialRoute: '.',
     routes: {
       '.':(context) => const Loading(),
-      './menu': (context) =>  const MyApp(),
+      './screen': (context) =>  const Screen()
     },
   ));
 }
