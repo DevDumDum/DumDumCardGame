@@ -53,219 +53,217 @@ class _ScreenState extends State<Screen> {
 
     return Scaffold(
       body: Container(
-        
+        alignment: Alignment.center,
+        height: double.infinity,
+        width: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/backgrounds/bg.png'),
-            fit: BoxFit.fitHeight
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
           )
         ),
-        child: Center(
-          child: Stack(
-            fit: StackFit.passthrough,
-            clipBehavior: Clip.antiAlias,
-            children: [
-
-              //================= Login Pannel =================
-              AnimatedSlide(
-                offset: loginOffset,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: BgPannel(
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      maxHeight: 450,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset('assets/images/labels/title1.png', fit: BoxFit.fitWidth,),
-                        Image.asset('assets/images/labels/title2.png', width: 150),
-                        
-                        const SizedBox(height: 80,),
+        child: Stack(
+          fit: StackFit.passthrough,
+          clipBehavior: Clip.antiAlias,
+          children: [
+            
+            //================= Login Pannel =================
+            AnimatedSlide(
+              offset: loginOffset,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: BgPannel(
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxHeight: 450,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/labels/title1.png', fit: BoxFit.fitWidth,),
+                      Image.asset('assets/images/labels/title2.png', width: 150),
+                      
+                      const SizedBox(height: 100,),
+                            
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
                 
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                
-                              Expanded(
-                                child: TextField(
-                                  controller: controllerText,
-                                  focusNode: textStatus,
-                                  style: const TextStyle(color: Colors.white),
-                                  decoration: const InputDecoration(
-                                    filled: true,
-                                    //enabled: textStatus,
-                                    fillColor: Color.fromRGBO(27, 4, 49, 1),
-                                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                                    isDense: true,
-                                    label: Text('USERNAME:', style: TextStyle(color: Colors.white70, letterSpacing: 1, fontSize: 12),),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(width: 1, color: Colors.black)
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(width: 1, color: Colors.white)
-                                    ),
-                                    
-                                    contentPadding: EdgeInsets.all(10),
+                            Expanded(
+                              child: TextField(
+                                controller: controllerText,
+                                focusNode: textStatus,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: const InputDecoration(
+                                  filled: true,
+                                  //enabled: textStatus,
+                                  fillColor: Color.fromRGBO(27, 4, 49, 1),
+                                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                                  isDense: true,
+                                  label: Text('USERNAME:', style: TextStyle(color: Colors.white70, letterSpacing: 1, fontSize: 12),),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 1, color: Colors.black)
                                   ),
-                                  autocorrect: false,
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 1, color: Colors.white)
+                                  ),
+                                  
+                                  contentPadding: EdgeInsets.all(10),
                                 ),
+                                autocorrect: false,
                               ),
-
-                              GestureDetector(
-                                onTap: (){
-                                  if(controllerText.text != ''){
+                            ),
+                          
+                            GestureDetector(
+                              onTap: (){
+                                if(controllerText.text != ''){
+                                  setState(() {
+                                    textStatus.unfocus();
+                                  });
+                          
+                                  saveUser();
+                          
+                                  Future.delayed( const Duration(milliseconds: 200), (){
                                     setState(() {
-                                      textStatus.unfocus();
+                                      data['loginOffset'] = loginOffset = const Offset(-1.0, 0.0);
+                                      data['menuOffset'] = menuOffset = Offset.zero;
                                     });
-
-                                    saveUser();
-
-                                    Future.delayed( const Duration(milliseconds: 200), (){
-                                      setState(() {
-                                        data['loginOffset'] = loginOffset = const Offset(-1.0, 0.0);
-                                        data['menuOffset'] = menuOffset = Offset.zero;
-                                      });
-                                    });
-                                  } else {
-                                    showDialog<void>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Please 🥺'),
-                                          content: const Text('Enter a unique username'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
-                                },
-                                child: RotatedBox(quarterTurns: 2, child: Image.asset('assets/images/icon_btn/back.png', fit: BoxFit.fill, height: 50, width: 50,)),
-                              )
-                            ],
-                          ),
+                                  });
+                                } else {
+                                  showDialog<void>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Please 🥺'),
+                                        content: const Text('Enter a unique username'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                              child: RotatedBox(quarterTurns: 2, child: Image.asset('assets/images/icon_btn/back.png', fit: BoxFit.fill, height: 50, width: 50,)),
+                            )
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              
-              //================= Menu Pannel =================
-              AnimatedSlide(
-                offset: menuOffset,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: BgPannel(
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      maxHeight: 450,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 40,),
-                        Image.asset('assets/images/labels/title1.png', fit: BoxFit.fitWidth,),
-                        Image.asset('assets/images/labels/title2.png', width: 150),
+            ),
+            
+            //================= Menu Pannel =================
+            AnimatedSlide(
+              offset: menuOffset,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: BgPannel(
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxHeight: 450,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 40,),
+                      Image.asset('assets/images/labels/title1.png', fit: BoxFit.fitWidth,),
+                      Image.asset('assets/images/labels/title2.png', width: 150),
+                      
+                      const SizedBox(height: 10,),
+                      Text('Hello $username'),
+            
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FlipBtn(
+                              imageFile: const AssetImage('assets/images/main_btn/play.png'),
+                              onFlip: (){
+                                Future.delayed( const Duration(milliseconds: 200),(){
+                                  showDialog<void>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Currently in Development 😉'),
+                                        content: const Text('Comming Soon...'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                });
+                              },
+                            ),
+                            
+                            const SizedBox(height: 5,),
+                            
+                            FlipBtn(
+                              imageFile: const AssetImage('assets/images/main_btn/scoreboard.png'),
+                              onFlip: (){
+                                Future.delayed( const Duration(milliseconds: 200),(){
+                                  showDialog<void>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Future feature 😱'),
+                                        content: Text('Comming Soon...'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                });
+                              },
+                            ),
                         
-                        const SizedBox(height: 10,),
-                        Text('Hello $username'),
-                        const SizedBox(height: 30,),
-                
-                        
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              FlipBtn(
-                                imageFile: const AssetImage('assets/images/main_btn/play.png'),
-                                onFlip: (){
-                                  Future.delayed( const Duration(milliseconds: 200),(){
-                                    showDialog<void>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Currently in Development 😉'),
-                                          content: const Text('Comming Soon...'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
+                            const SizedBox(height: 5,),
+            
+                            FlipBtn(
+                              imageFile: const AssetImage('assets/images/main_btn/exit.png'),
+                              onFlip: (){
+                                Future.delayed( const Duration(milliseconds: 200),() {
+                                  setState(() {
+                                    data['loginOffset'] = loginOffset = Offset.zero;
+                                    data['menuOffset'] = menuOffset = const Offset(1.0, 0.0);
                                   });
-                                },
-                              ),
-                              
-                              const SizedBox(height: 5,),
-                              
-                              FlipBtn(
-                                imageFile: const AssetImage('assets/images/main_btn/scoreboard.png'),
-                                onFlip: (){
-                                  Future.delayed( const Duration(milliseconds: 200),(){
-                                    showDialog<void>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Future feature 😱'),
-                                          content: Text('Comming Soon...${data["username"]}'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  });
-                                },
-                              ),
-                          
-                              const SizedBox(height: 5,),
-
-                              FlipBtn(
-                                imageFile: const AssetImage('assets/images/main_btn/exit.png'),
-                                onFlip: (){
                                   removeUser();
-                                  Future.delayed( const Duration(milliseconds: 200),() {
-                                    setState(() {
-                                      data['loginOffset'] = loginOffset = Offset.zero;
-                                      data['menuOffset'] = menuOffset = const Offset(1.0, 0.0);
-                                    });
-                                  });
-                                }
-                              ),
-
-                            ],
-                          ),
+                                });
+                              }
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 30,),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 30,),
+                    ],
                   ),
                 ),
-              )
-
-            ]
-          ),
+              ),
+            )
+            
+          ]
         ),
       ),
     );
