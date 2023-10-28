@@ -17,6 +17,7 @@ class _LoadingState extends State<Loading> {
   void checkUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? username= prefs.getString('username');
+    final int? highScore= prefs.getInt('highscore');
     Offset o1 = Offset.zero;
     Offset o2 = const Offset(1.0,0.0);
     dataStatus = true;
@@ -74,6 +75,7 @@ class _LoadingState extends State<Loading> {
         'loginOffset': o1,
         'menuOffset': o2,
         'username': username,
+        'highscore': highScore?? 0
     });
   }
 

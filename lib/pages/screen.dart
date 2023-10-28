@@ -15,6 +15,7 @@ class _ScreenState extends State<Screen> {
 
   Map data = {};
   String? username = '';
+  int highscore = 0;
 
   final controllerText = TextEditingController();
   FocusNode textStatus = FocusNode();
@@ -28,18 +29,23 @@ class _ScreenState extends State<Screen> {
   void saveUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', controllerText.text);
+    await prefs.setInt('highscore', highscore);
     
     final String? tempname= prefs.getString('username');
+    final int? temphs = prefs.getInt('highscore');
     username = data['username'] = tempname;
-    debugPrint('Username created: $tempname');
+    highscore = data['highscore'] = temphs ?? 0;
+    debugPrint('Username created: $tempname | $highscore');
   }
 
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
+    await prefs.remove('highscore');
     username = data['username'] = "";
+    highscore = data['highscore'] = 0;
     // final String? username= prefs.getString('username');
-    debugPrint('Detected: $username');
+    debugPrint('Detected: $username | $highscore');
   }
 
   @override
@@ -48,6 +54,7 @@ class _ScreenState extends State<Screen> {
     Offset loginOffset = data['loginOffset'];
     Offset menuOffset = data['menuOffset'];
     username = data['username'];
+    highscore = data['highscore'];
     
     //=== Welcome Back Message ===
 
@@ -182,7 +189,8 @@ class _ScreenState extends State<Screen> {
                       
                       const SizedBox(height: 10,),
                       Text('Hello $username'),
-            
+                      Text('Best Score: $highscore'),
+
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -191,23 +199,24 @@ class _ScreenState extends State<Screen> {
                               imageFile: const AssetImage('assets/images/main_btn/play.png'),
                               onFlip: (){
                                 Future.delayed( const Duration(milliseconds: 200),(){
-                                  showDialog<void>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Currently in Development 😉'),
-                                        content: const Text('Comming Soon...'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('OK'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                  startgame(context);
+                                  // showDialog<void>(
+                                  //   context: context,
+                                  //   builder: (BuildContext context) {
+                                  //     return AlertDialog(
+                                  //       title: const Text('Currently in Development 😉'),
+                                  //       content: const Text('Comming Soon...'),
+                                  //       actions: <Widget>[
+                                  //         TextButton(
+                                  //           onPressed: () {
+                                  //             Navigator.pop(context);
+                                  //           },
+                                  //           child: const Text('OK'),
+                                  //         ),
+                                  //       ],
+                                  //     );
+                                  //   },
+                                  // );
                                 });
                               },
                             ),
@@ -223,7 +232,7 @@ class _ScreenState extends State<Screen> {
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title: const Text('Future feature 😱'),
-                                        content: Text('Comming Soon...'),
+                                        content: const Text('Comming Soon...'),
                                         actions: <Widget>[
                                           TextButton(
                                             onPressed: () {
@@ -261,11 +270,29 @@ class _ScreenState extends State<Screen> {
                   ),
                 ),
               ),
-            )
-            
+            ),
           ]
         ),
       ),
     );
+  }
+  Future<void> startgame(BuildContext) async{
+    final result = await Navigator.pushNamed(context, './game', 
+      arguments: {
+        'username': username,
+        'highscore': highscore
+      }
+    ) as int;
+    if (!mounted) return;
+    if((result.runtimeType) == int){
+      print("nice");
+      setState(() {
+        highscore = data['highscore'] = result;
+      });
+    };
+
+    ScaffoldMessenger.of(context)
+    ..removeCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text('$result')));
   }
 }

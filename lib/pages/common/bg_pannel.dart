@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class BgPannel extends StatelessWidget {
   
   final Widget? child;
+  final double? height;
 
-  const BgPannel({super.key, required this.child});
+  const BgPannel({super.key, this.height, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
+          height: height,
           margin: const EdgeInsets.symmetric(horizontal: 10),
           padding: const EdgeInsets.all(50),
           constraints: const BoxConstraints(
