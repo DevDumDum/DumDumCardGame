@@ -109,7 +109,34 @@ flutter:
     - assets/images/labels/HS-name.png
     - assets/images/labels/HS-score.png
     - assets/images/labels/HS-time.png
+    - assets/images/labels/HS-time.png
 
+    - assets/images/symbols/1.png
+    - assets/images/symbols/2.png
+    - assets/images/symbols/3.png
+    - assets/images/symbols/4.png
+    - assets/images/symbols/5.png
+    - assets/images/symbols/6.png
+    - assets/images/symbols/7.png
+    - assets/images/symbols/8.png
+    - assets/images/symbols/9.png
+    - assets/images/symbols/10.png
+    - assets/images/symbols/11.png
+    - assets/images/symbols/12.png
+    - assets/images/symbols/13.png
+    - assets/images/symbols/14.png
+    - assets/images/symbols/15.png
+    - assets/images/symbols/16.png
+    - assets/images/symbols/17.png
+    - assets/images/symbols/18.png
+    - assets/images/symbols/19.png
+    - assets/images/symbols/20.png
+    - assets/images/symbols/21.png
+    - assets/images/symbols/22.png
+    - assets/images/symbols/23.png
+    - assets/images/symbols/24.png
+    - assets/images/symbols/25.png
+    - assets/images/symbols/26.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
