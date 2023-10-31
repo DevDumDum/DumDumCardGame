@@ -53,7 +53,7 @@ class _PlayerTimerState extends State<PlayerTimer> {
     Column(
     children: [Text(
       'Player Time: $playerTime',
-      style: const TextStyle(fontSize: 16),
+      style: const TextStyle(fontSize: 17),
     ),
     ]);
   }

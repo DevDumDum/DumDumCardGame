@@ -280,29 +280,29 @@ class _GameState extends State<Game> {
                 height: double.infinity,
                 child: Column(
                   children: [
+                    const SizedBox(height: 20,),
                     const PlayerTimer(),
               
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
+                        padding: const EdgeInsets.only(bottom: 20, top: 0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
                           for(int zz = 0; zz < cards.length; zz++)
                             for(int x = 0; x < col; x++)
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  for(int i = 0; i < row; i++, zz++)
-                                  Container(
-                                    child: 
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    for(int i = 0; i < row; i++, zz++)
                                     (){
                                       cardId.putIfAbsent(zz, () => GlobalKey<FlipCardState>());
                                       GlobalKey<FlipCardState>? thisCard = cardId[zz];
                                       cardState[zz] = true;
                                       // bool tempState = cardState[zz];
-              
+                                          
                                     return FlipCard(
                                       key: thisCard,
                                       //autoFlipDuration: const Duration(seconds: 1),
@@ -311,11 +311,14 @@ class _GameState extends State<Game> {
                                       direction: FlipDirection.HORIZONTAL,
                                       side: CardSide.FRONT,
                                       autoFlipDuration: const Duration(milliseconds: 800),
-                                      front: Image(
-                                        image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
-                                        fit: BoxFit.contain,
-                                        height: ((MediaQuery.of(context).size.height-400)/col)-20,
-                                        width: ((MediaQuery.of(context).size.width-100)/col)-20,
+                                      front: Container(
+                                        padding: const EdgeInsets.symmetric(vertical:10),
+                                        // color: Colors.white,
+                                        child: Image(
+                                          image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
+                                          fit: BoxFit.fill,
+                                          width: ((MediaQuery.of(context).size.width-50)/col)-20,
+                                        ),
                                       ),
                                       back: 
                                       TextButton(
@@ -324,8 +327,9 @@ class _GameState extends State<Game> {
                                         ),
                                         child: Image.asset(
                                           "assets/images/backgrounds/backCard.png",
-                                          fit: BoxFit.contain,
-                                          height: (MediaQuery.of(context).size.height-400)/col,
+                                          fit: BoxFit.fill,
+                                          height: ((MediaQuery.of(context).size.height-300)/col)-20,
+                                          width: ((MediaQuery.of(context).size.width-40)/col)-20,
                                         ),
                                         
                                         onPressed: () {
@@ -363,7 +367,7 @@ class _GameState extends State<Game> {
                                       //   if(lastFlipped !=null){
                                       //     if(cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)] != cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]){
                                       //       thisCard?.currentState?.toggleCard();
-              
+                                          
                                       //       if(lastFlipped?.currentState?.isFront == true)
                                       //         lastFlipped?.currentState?.toggleCard();
                                       //       print("Wrong: ${cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)]} | ${cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]}");
@@ -390,9 +394,9 @@ class _GameState extends State<Game> {
                                       //   // }
                                       // },
                                     );
-                                    }(),
-                                  )
-                                ],
+                                    }()
+                                  ],
+                                ),
                               ) 
                             // Text('${cards.length} : $row | $col'),
                             // Text(((MediaQuery.of(context).size.height)).toString()),
