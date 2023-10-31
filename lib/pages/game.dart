@@ -1,7 +1,10 @@
 import 'package:dumdumcard/pages/common/bg_pannel.dart';
+import 'package:dumdumcard/pages/components/timer.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:async';
+
 
 class Game extends StatefulWidget {
   const Game({super.key});
@@ -24,7 +27,11 @@ class Game extends StatefulWidget {
 //     }
 //   }  
 // }
+
+
+
 class _GameState extends State<Game> {
+
   Map data = {};
   int hs = 0;
   
@@ -34,13 +41,11 @@ class _GameState extends State<Game> {
     hs = data['highscore'];
     int row = data['row']?? 4;
     int col = data['col']?? 4;
+
+    int solvedCards = 0;
     List cards = [];
-    bool flipStatus = true;
-    List cardPressed = []; // the order of cards pressed
-
-    GlobalKey<FlipCardState>? lastFlipped;
-    var cardId = Map<int, GlobalKey<FlipCardState>>();
-
+    var cardId = <int, GlobalKey<FlipCardState>>{};
+    
     Map cardState = {};
 
     void generateCard(){
@@ -61,16 +66,19 @@ class _GameState extends State<Game> {
       // print('Pair: $totalPair');
 
       cards.shuffle();
-      print('Shuffled: $cards');
+      // print('Shuffled: $cards');
+      // Future.delayed(Duration(milliseconds: 800),(){
+      //   startTime();
+      // });
     }
 
     generateCard();
 
-    var card1;
-    var card2;
+    GlobalKey<FlipCardState>? card1;
+    GlobalKey<FlipCardState>? card2;
 
     Future <void> foldCard(cd1, cd2) async {
-      Future.delayed(Duration(milliseconds: 500), (){
+      Future.delayed(const Duration(milliseconds: 500), (){
         cd2?.currentState?.toggleCard();
         cd1?.currentState?.toggleCard();
         // print('++++++++++++++++++++');
@@ -80,17 +88,64 @@ class _GameState extends State<Game> {
       });
     }
 
+    int loadScore(){
+      hs = data['highscore'] = solvedCards;
+      return hs;
+    }
+
+    void playerWinCheck(){
+      if(row*col == solvedCards){
+        Future.delayed( const Duration(milliseconds: 400),(){
+          showDialog<void>(
+            context: context,
+            builder: (BuildContext context) {
+              return  Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 250),
+                  child: AlertDialog(
+                    title: const Text('Congraaaaats'),
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Pair solved: $solvedCards'),
+                        const Text('Time: comming soon...'),
+                      ],
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        });
+      }
+    }
+
     void check() async {
       int curId = cardId.keys.firstWhere((k) => cardId[k] == card1);
       int lastId = cardId.keys.firstWhere((k) => cardId[k] == card2);
-      print('===================');
-      print('${cards[curId]} == ${cards[lastId]}');
+      // print('===================');
+      // print('${cards[curId]} == ${cards[lastId]}');
       if(cards[curId] != cards[lastId]){
         await foldCard(card1, card2);
-        print("$card1 | $card2");
+        // print("$card1 | $card2");
+      } else {
+        solvedCards+=2;
+        loadScore();
       }
       card1 = card2 = null;
+
+      playerWinCheck();
     }
+
+
     // Future <void> removeCard() async {
     //   await Future.delayed(Duration(milliseconds: 400), (){
     //     cardPressed.removeAt(0);
@@ -200,10 +255,10 @@ class _GameState extends State<Game> {
     //     }
     //   }
     // }
+    
 
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.only(top: 100,bottom: 20),
         alignment: Alignment.center,
         height: double.infinity,
         width: double.infinity,
@@ -218,161 +273,194 @@ class _GameState extends State<Game> {
           fit: StackFit.passthrough,
           clipBehavior: Clip.antiAlias,
           children: [
-            BgPannel(
-              height: double.infinity,
-              child: Column(
-                children: [
-                  Text("Highscore: $hs"),
-
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                        for(int zz = 0; zz < cards.length; zz++)
-                          for(int x = 0; x < col; x++)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                for(int i = 0; i < row; i++, zz++)
-                                Container(
-                                  child: 
-                                  (){
-                                    cardId.putIfAbsent(zz, () => GlobalKey<FlipCardState>());
-                                    GlobalKey<FlipCardState>? thisCard = cardId[zz];
-                                    cardState[zz] = true;
-                                    // bool tempState = cardState[zz];
-
-                                  return FlipCard(
-                                    key: thisCard,
-                                    //autoFlipDuration: const Duration(seconds: 1),
-                                    flipOnTouch: false,
-                                    speed: 400,
-                                    direction: FlipDirection.HORIZONTAL,
-                                    side: CardSide.BACK,
-                                    front: Image(
-                                      image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
-                                      fit: BoxFit.cover,
-                                      height: ((MediaQuery.of(context).size.height-400)/col)-20,
-                                      width: ((MediaQuery.of(context).size.width-100)/col)-20,
-                                    ),
-                                    back: 
-                                    TextButton(
-                                      style: TextButton.styleFrom(
-                                        padding: EdgeInsets.zero
+            
+            Padding(
+              padding: const EdgeInsets.only(top: 90, bottom: 20),
+              child: BgPannel(
+                height: double.infinity,
+                child: Column(
+                  children: [
+                    const PlayerTimer(),
+              
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                          for(int zz = 0; zz < cards.length; zz++)
+                            for(int x = 0; x < col; x++)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  for(int i = 0; i < row; i++, zz++)
+                                  Container(
+                                    child: 
+                                    (){
+                                      cardId.putIfAbsent(zz, () => GlobalKey<FlipCardState>());
+                                      GlobalKey<FlipCardState>? thisCard = cardId[zz];
+                                      cardState[zz] = true;
+                                      // bool tempState = cardState[zz];
+              
+                                    return FlipCard(
+                                      key: thisCard,
+                                      //autoFlipDuration: const Duration(seconds: 1),
+                                      flipOnTouch: false,
+                                      speed: 400,
+                                      direction: FlipDirection.HORIZONTAL,
+                                      side: CardSide.FRONT,
+                                      autoFlipDuration: const Duration(milliseconds: 800),
+                                      front: Image(
+                                        image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
+                                        fit: BoxFit.contain,
+                                        height: ((MediaQuery.of(context).size.height-400)/col)-20,
+                                        width: ((MediaQuery.of(context).size.width-100)/col)-20,
                                       ),
-                                      child: Image.asset(
-                                        "assets/images/backgrounds/backCard.png",
-                                        fit: BoxFit.cover,
-                                        height: (MediaQuery.of(context).size.height-400)/col,
-                                      ),
-                                      
-                                      onPressed: () {
-
-                                        if(card1 == null){
-                                          thisCard?.currentState?.toggleCard();
-                                          card1 = thisCard;
-                                        } else {
-                                          thisCard?.currentState?.toggleCard();
-                                          card2 = thisCard;
-                                          check();
-                                        }
-                                        // if(!cardPressed.contains(thisCard)){
-                                        //   cardPressed.add(thisCard);
-                                        //   thisCard?.currentState?.toggleCard();
-                                        //   print('>> $cardPressed');
-                                        //   Future.delayed(Duration(milliseconds: 400),(){
-                                        //     // if(flipStatus){
-                                        //       flipper();
-                                        //     // }
-                                        //   });
-                                        // }
-                                      },
-                                    )
-                                    // Column(
-                                    //   children: [
-                                    //     Text('${zz}'),
-                                    //     Image(
-                                    //       image: const AssetImage("assets/images/backgrounds/backCard.png"),
-                                    //       fit: BoxFit.cover,
-                                    //       height: (MediaQuery.of(context).size.height-400)/col,
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    // onFlipDone:(isFront){
-                                    //   if(lastFlipped !=null){
-                                    //     if(cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)] != cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]){
-                                    //       thisCard?.currentState?.toggleCard();
-
-                                    //       if(lastFlipped?.currentState?.isFront == true)
-                                    //         lastFlipped?.currentState?.toggleCard();
-                                    //       print("Wrong: ${cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)]} | ${cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]}");
-                                    //       lastFlipped = null;
-                                    //     } else {
-                                    //       cardState[cardId.keys.firstWhere((k) => cardId[k] == thisCard)] = false;
-                                    //       cardState[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)] = false;
-                                    //       print("Correct: ${cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)]} | ${cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]}");
-                                    //       print(lastFlipped);
-                                    //     }
-                                    //   } else {
-                                    //     Future.delayed(Duration(milliseconds: 300), (){
-                                    //       cardState[cardId.keys.firstWhere((k) => cardId[k] == thisCard)] = false;
-                                    //       print('State: ${cardState}');
-                                    //     });
-                                    //     print("done");
-                                    //     lastFlipped = thisCard;
-                                    //   }
-                                    // },
-                                    // onFlip: (){
-                                    //   // if(thisCard?.currentState?.isFront == true && lastFlipped == null){
-                                    //   //   thisCard?.currentState?.toggleCardWithoutAnimation();
-                                    //   //   print("clicked again");
-                                    //   // }
-                                    // },
-                                  );
-                                  }(),
-                                )
-                              ],
-                            ) 
-                          // Text('${cards.length} : $row | $col'),
-                          // Text(((MediaQuery.of(context).size.height)).toString()),
-                          // Text((MediaQuery.of(context).size.width).toString()),
-                          // Text((MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height)).toString()),
-                          // Text((MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / row)).toString())
-                        ],
+                                      back: 
+                                      TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero
+                                        ),
+                                        child: Image.asset(
+                                          "assets/images/backgrounds/backCard.png",
+                                          fit: BoxFit.contain,
+                                          height: (MediaQuery.of(context).size.height-400)/col,
+                                        ),
+                                        
+                                        onPressed: () {
+                                          if(card1 == null){
+                                            thisCard?.currentState?.toggleCard();
+                                            card1 = thisCard;
+                                          } else {
+                                            thisCard?.currentState?.toggleCard();
+                                            card2 = thisCard;
+                                            check();
+                                          }
+                                          // if(!cardPressed.contains(thisCard)){
+                                          //   cardPressed.add(thisCard);
+                                          //   thisCard?.currentState?.toggleCard();
+                                          //   print('>> $cardPressed');
+                                          //   Future.delayed(Duration(milliseconds: 400),(){
+                                          //     // if(flipStatus){
+                                          //       flipper();
+                                          //     // }
+                                          //   });
+                                          // }
+                                        },
+                                      )
+                                      // Column(
+                                      //   children: [
+                                      //     Text('${zz}'),
+                                      //     Image(
+                                      //       image: const AssetImage("assets/images/backgrounds/backCard.png"),
+                                      //       fit: BoxFit.cover,
+                                      //       height: (MediaQuery.of(context).size.height-400)/col,
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      // onFlipDone:(isFront){
+                                      //   if(lastFlipped !=null){
+                                      //     if(cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)] != cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]){
+                                      //       thisCard?.currentState?.toggleCard();
+              
+                                      //       if(lastFlipped?.currentState?.isFront == true)
+                                      //         lastFlipped?.currentState?.toggleCard();
+                                      //       print("Wrong: ${cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)]} | ${cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]}");
+                                      //       lastFlipped = null;
+                                      //     } else {
+                                      //       cardState[cardId.keys.firstWhere((k) => cardId[k] == thisCard)] = false;
+                                      //       cardState[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)] = false;
+                                      //       print("Correct: ${cards[cardId.keys.firstWhere((k) => cardId[k] == lastFlipped)]} | ${cards[cardId.keys.firstWhere((k) => cardId[k] == thisCard)]}");
+                                      //       print(lastFlipped);
+                                      //     }
+                                      //   } else {
+                                      //     Future.delayed(Duration(milliseconds: 300), (){
+                                      //       cardState[cardId.keys.firstWhere((k) => cardId[k] == thisCard)] = false;
+                                      //       print('State: ${cardState}');
+                                      //     });
+                                      //     print("done");
+                                      //     lastFlipped = thisCard;
+                                      //   }
+                                      // },
+                                      // onFlip: (){
+                                      //   // if(thisCard?.currentState?.isFront == true && lastFlipped == null){
+                                      //   //   thisCard?.currentState?.toggleCardWithoutAnimation();
+                                      //   //   print("clicked again");
+                                      //   // }
+                                      // },
+                                    );
+                                    }(),
+                                  )
+                                ],
+                              ) 
+                            // Text('${cards.length} : $row | $col'),
+                            // Text(((MediaQuery.of(context).size.height)).toString()),
+                            // Text((MediaQuery.of(context).size.width).toString()),
+                            // Text((MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height)).toString()),
+                            // Text((MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / row)).toString())
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
-            ElevatedButton(
-              onPressed: (){
-                setState(() {
-                  // hs = data['highscore']+=2;
-                  //hs = Random().nextInt(3);
-                  generateCard();
-                  //print(hs+1);
-                });
-              },
-              child: const Text("increment"),
-            ),
+            Container(
+                  padding: const EdgeInsets.only(top:60, left: 20, right: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // ElevatedButton(
+                      //   onPressed: (){
+                      //     // PlayerTimer(startTime());
+                      //   },
+                      //   child: const Text('Start timer'),
+                      // ),
+                      IconButton(
+                        icon: Image.asset(
+                          'assets/images/icon_btn/reset.png',
+                          fit: BoxFit.fill,
+                        ),
+                        padding: EdgeInsets.zero,
+                        iconSize: 50,
+                        onPressed: () {
+                          setState(() {
+                            generateCard();
+                          });
+                        },
+                      ),
+                
+                      const SizedBox(width: 10,),
+                
+                      IconButton(
+                        icon: Image.asset(
+                          'assets/images/icon_btn/close.png',
+                          fit: BoxFit.fill,
+                        ),
+                        padding: EdgeInsets.zero,
+                        iconSize: 50,
+                        onPressed: () {
+                          Navigator.pop(context, hs);
+                        },
+                      )
+                    ]
+                  ),
+                ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: Image.asset('assets/images/icon_btn/close.png'),
-                  onPressed: () {
-                    Navigator.pop(context, hs);
-                  },
-                )
-              ]
-            ),
-
+            // ElevatedButton(
+            //   onPressed: (){
+            //     setState(() {
+            //       // hs = data['highscore']+=2;
+            //       //hs = Random().nextInt(3);
+            //       generateCard();
+            //       //print(hs+1);
+            //     });
+            //   },
+            //   child: const Text("Reset"),
+            // ),
           ],
         ),
       ),

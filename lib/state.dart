@@ -1,15 +1,13 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-class MainDataWidget extends InheritedWidget{
-  final int highscore;
+// class MainDataWidget extends InheritedWidget{
+//   final int highscore;
 
-  const MainDataWidget ({
-    Key? key,
-    required Widget child,
-    required this.highscore,
+//   const MainDataWidget ({super.key, 
+//     required super.child,
+//     required this.highscore,
+//   });
 
-  }): super( child: child);
-
-  @override
-  bool updateShouldNotify(MainDataWidget oldWidget) => oldWidget != highscore;
-}
+//   @override
+//   bool updateShouldNotify(MainDataWidget oldWidget) => oldWidget != highscore;
+// }

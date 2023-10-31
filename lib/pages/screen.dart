@@ -94,7 +94,7 @@ class _ScreenState extends State<Screen> {
                       const SizedBox(height: 100,),
                             
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        padding: const EdgeInsets.only(left: 30),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -123,15 +123,16 @@ class _ScreenState extends State<Screen> {
                                 autocorrect: false,
                               ),
                             ),
-                          
+                            
+                            const SizedBox(width: 10,),
+
                             GestureDetector(
                               onTap: (){
                                 if(controllerText.text != ''){
                                   setState(() {
                                     textStatus.unfocus();
+                                    saveUser();
                                   });
-                          
-                                  saveUser();
                           
                                   Future.delayed( const Duration(milliseconds: 200), (){
                                     setState(() {
@@ -276,7 +277,7 @@ class _ScreenState extends State<Screen> {
       ),
     );
   }
-  Future<void> startgame(BuildContext) async{
+  Future<void> startgame(BuildContext context) async{
     final result = await Navigator.pushNamed(context, './game', 
       arguments: {
         'username': username,
@@ -285,11 +286,11 @@ class _ScreenState extends State<Screen> {
     ) as int;
     if (!mounted) return;
     if((result.runtimeType) == int){
-      print("nice");
+      // print("nice");
       setState(() {
         highscore = data['highscore'] = result;
       });
-    };
+    }
 
     ScaffoldMessenger.of(context)
     ..removeCurrentSnackBar()
