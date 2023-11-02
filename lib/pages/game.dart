@@ -1,9 +1,6 @@
-import 'package:dumdumcard/pages/common/bg_pannel.dart';
-import 'package:dumdumcard/pages/components/timer.dart';
-import 'package:flip_card/flip_card.dart';
+import 'package:dumdumcard/pages/components/board.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'dart:async';
 
 
 class Game extends StatefulWidget {
@@ -42,11 +39,7 @@ class _GameState extends State<Game> {
     int row = data['row']?? 4;
     int col = data['col']?? 4;
 
-    int solvedCards = 0;
     List cards = [];
-    var cardId = <int, GlobalKey<FlipCardState>>{};
-    
-    Map cardState = {};
 
     void generateCard(){
       int totalPair = ((row*col)/2).round();
@@ -56,95 +49,16 @@ class _GameState extends State<Game> {
           temp = (Random().nextInt(25) +1);
           if(!cards.contains(temp)) break;
         }
-        
-        //adding 2 cards to the list of cards
         cards.add(temp);
         cards.add(temp);
 
       }
-      // print('Set: $cards');
-      // print('Pair: $totalPair');
-
       cards.shuffle();
-      // print('Shuffled: $cards');
-      // Future.delayed(Duration(milliseconds: 800),(){
-      //   startTime();
-      // });
     }
 
     generateCard();
 
-    GlobalKey<FlipCardState>? card1;
-    GlobalKey<FlipCardState>? card2;
-
-    Future <void> foldCard(cd1, cd2) async {
-      Future.delayed(const Duration(milliseconds: 500), (){
-        cd2?.currentState?.toggleCard();
-        cd1?.currentState?.toggleCard();
-        // print('++++++++++++++++++++');
-        // print(card2);
-        // print(card1);
-        // print('++++++++++++++++++++');
-      });
-    }
-
-    int loadScore(){
-      hs = data['highscore'] = solvedCards;
-      return hs;
-    }
-
-    void playerWinCheck(){
-      if(row*col == solvedCards){
-        Future.delayed( const Duration(milliseconds: 400),(){
-          showDialog<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return  Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 250),
-                  child: AlertDialog(
-                    title: const Text('Congraaaaats'),
-                    content: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Pair solved: $solvedCards'),
-                        const Text('Time: comming soon...'),
-                      ],
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        });
-      }
-    }
-
-    void check() async {
-      int curId = cardId.keys.firstWhere((k) => cardId[k] == card1);
-      int lastId = cardId.keys.firstWhere((k) => cardId[k] == card2);
-      // print('===================');
-      // print('${cards[curId]} == ${cards[lastId]}');
-      if(cards[curId] != cards[lastId]){
-        await foldCard(card1, card2);
-        // print("$card1 | $card2");
-      } else {
-        solvedCards+=2;
-        loadScore();
-      }
-      card1 = card2 = null;
-
-      playerWinCheck();
-    }
-
+    
 
     return Scaffold(
       body: Container(
@@ -163,93 +77,7 @@ class _GameState extends State<Game> {
           clipBehavior: Clip.antiAlias,
           children: [
             
-            Padding(
-              padding: const EdgeInsets.only(top: 90, bottom: 20),
-              child: BgPannel(
-                height: double.infinity,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20,),
-                    const PlayerTimer(),
-              
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20, top: 0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                          for(int zz = 0; zz < cards.length; zz++)
-                            for(int x = 0; x < col; x++)
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    for(int i = 0; i < row; i++, zz++)
-                                    (){
-                                      cardId.putIfAbsent(zz, () => GlobalKey<FlipCardState>());
-                                      GlobalKey<FlipCardState>? thisCard = cardId[zz];
-                                      cardState[zz] = true;
-                                      // bool tempState = cardState[zz];
-                                          
-                                    return FlipCard(
-                                      key: thisCard,
-                                      //autoFlipDuration: const Duration(seconds: 1),
-                                      flipOnTouch: false,
-                                      speed: 400,
-                                      direction: FlipDirection.HORIZONTAL,
-                                      side: CardSide.FRONT,
-                                      autoFlipDuration: const Duration(milliseconds: 800),
-                                      front: Container(
-                                        padding: const EdgeInsets.symmetric(vertical:10),
-                                        // color: Colors.white,
-                                        child: Image(
-                                          image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
-                                          fit: BoxFit.fill,
-                                          width: ((MediaQuery.of(context).size.width-50)/col)-20,
-                                        ),
-                                      ),
-                                      back: 
-                                      TextButton(
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.zero
-                                        ),
-                                        child: Image.asset(
-                                          "assets/images/backgrounds/backCard.png",
-                                          fit: BoxFit.fill,
-                                          height: ((MediaQuery.of(context).size.height-300)/col)-20,
-                                          width: ((MediaQuery.of(context).size.width-40)/col)-20,
-                                        ),
-                                        
-                                        onPressed: () {
-                                          if(card1 == null){
-                                            thisCard?.currentState?.toggleCard();
-                                            card1 = thisCard;
-                                          } else {
-                                            thisCard?.currentState?.toggleCard();
-                                            card2 = thisCard;
-                                            check();
-                                          }
-                                        },
-                                      )
-                                    );
-                                    }()
-                                  ],
-                                ),
-                              ) 
-                            // Text('${cards.length} : $row | $col'),
-                            // Text(((MediaQuery.of(context).size.height)).toString()),
-                            // Text((MediaQuery.of(context).size.width).toString()),
-                            // Text((MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height)).toString()),
-                            // Text((MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / row)).toString())
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            Board(data: data, cards: cards, row: row, column: col),
 
             Container(
                   padding: const EdgeInsets.only(top:60, left: 20, right: 20),

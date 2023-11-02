@@ -14,7 +14,7 @@ class BgPannel extends StatelessWidget {
         Container(
           height: height,
           margin: const EdgeInsets.symmetric(horizontal: 10),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(35),
           constraints: const BoxConstraints(
             minHeight: 450,
             minWidth: double.infinity

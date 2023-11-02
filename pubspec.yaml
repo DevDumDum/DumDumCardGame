@@ -89,6 +89,7 @@ flutter:
     - assets/images/main_btn/join.png
     - assets/images/main_btn/play.png
     - assets/images/main_btn/scoreboard.png
+    - assets/images/main_btn/scoreboard-disable.png
     - assets/images/main_btn/exit.png
 
     - assets/images/icon_btn/back.png

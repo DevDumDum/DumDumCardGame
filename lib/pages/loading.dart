@@ -13,6 +13,7 @@ class _LoadingState extends State<Loading> {
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
   bool loadStatus = true;
   bool dataStatus = false;
+  bool connection = false; //if connected to the internet / database was established, then true
 
   void checkUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -75,7 +76,8 @@ class _LoadingState extends State<Loading> {
         'loginOffset': o1,
         'menuOffset': o2,
         'username': username,
-        'highscore': highScore?? 0
+        'highscore': highScore?? 0,
+        'internetStatus': connection,
     });
   }
 

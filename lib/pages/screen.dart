@@ -56,6 +56,13 @@ class _ScreenState extends State<Screen> {
     username = data['username'];
     highscore = data['highscore'];
     
+    AssetImage scoreboardAccess(){
+      if(data['connection'] == true){
+        return const AssetImage('assets/images/main_btn/scoreboard.png');
+      } else {
+        return const AssetImage('assets/images/main_btn/scoreboard-disable.png');
+      }
+    }
     //=== Welcome Back Message ===
 
     return Scaffold(
@@ -225,27 +232,50 @@ class _ScreenState extends State<Screen> {
                             const SizedBox(height: 5,),
                             
                             FlipBtn(
-                              imageFile: const AssetImage('assets/images/main_btn/scoreboard.png'),
+                              imageFile: scoreboardAccess(),
                               onFlip: (){
-                                Future.delayed( const Duration(milliseconds: 200),(){
-                                  showDialog<void>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Future feature 😱'),
-                                        content: const Text('Comming Soon...'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('OK'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                });
+                                if (data['internetStatus'] == false) {
+                                  Future.delayed( const Duration(milliseconds: 200),(){
+                                    showDialog<void>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('No connection 🥹'),
+                                          content: const Text('Restart the app with internet on...'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  });
+                                } else {
+                                  Future.delayed( const Duration(milliseconds: 200),(){
+                                    showDialog<void>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Future feature 😱'),
+                                          content: const Text('Comming Soon...'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  });
+                                  //Navigator.pushNamed(context, './leaderboard');
+                                }
                               },
                             ),
                         
@@ -292,8 +322,8 @@ class _ScreenState extends State<Screen> {
       });
     }
 
-    ScaffoldMessenger.of(context)
-    ..removeCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text('$result')));
+    // ScaffoldMessenger.of(context)
+    // ..removeCurrentSnackBar()
+    // ..showSnackBar(SnackBar(content: Text('$result')));
   }
 }
