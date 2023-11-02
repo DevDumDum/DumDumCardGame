@@ -67,7 +67,7 @@ class _CardLoaderState extends State<CardLoader> {
           } else {
             thisCard?.currentState?.toggleCard();
             card2 = thisCard;
-            check();
+            // check();
           }
         },
       )
