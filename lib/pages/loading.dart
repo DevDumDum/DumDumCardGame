@@ -11,17 +11,20 @@ class Loading extends StatefulWidget {
 
 class _LoadingState extends State<Loading> {
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
-  bool loadStatus = true;
-  bool dataStatus = false;
+  bool loadStatus = true; //flipping logo animation on
+  bool dataStatus = false; //if all data loaded
   bool connection = false; //if connected to the internet / database was established, then true
 
   void checkUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? username= prefs.getString('username');
-    final int? highScore= prefs.getInt('highscore');
+    final int? bestMoves= prefs.getInt('bestMoves');
+    final int? totalPairs= prefs.getInt('totalPairs');
+    final int? bestTime= prefs.getInt('bestsime');
+
     Offset o1 = Offset.zero;
     Offset o2 = const Offset(1.0,0.0);
-    dataStatus = true;
+    dataStatus = true; //local user loaded
 
     //animation loop
     while(loadStatus){
@@ -43,41 +46,22 @@ class _LoadingState extends State<Loading> {
     } else {
       debugPrint('No User:{ $username }');
     }
-    
-    // double opa = 1.0;
-    // await showDialog<void>(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AnimatedOpacity(
-    //       opacity: opa,
-    //       duration: Duration(milliseconds: 500),
-    //       child: AlertDialog(
-    //         title: const Text('Thanks 😊'),
-    //         content: Text('Welcome Back $username!'),
-    //         actions: <Widget>[
-    //           TextButton(
-    //             onPressed: () {
-    //               opa = 0.0;
-    //               Future.delayed(Duration(seconds: 1),(){
-    //                 Navigator.pop(context);
-    //               });
-    //             },
-    //             child: const Text('OK'),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   },
-    // );
 
     if (!context.mounted) return;
+    debugPrint("done loading");
+
     Navigator.pushReplacementNamed(context, './screen', 
       arguments: {
         'loginOffset': o1,
         'menuOffset': o2,
+        'cardRow': 4,
+        'cardCol': 4,
         'username': username,
-        'highscore': highScore?? 0,
-        'internetStatus': connection,
+        'bestMoves': bestMoves?? 0,
+        'totalPairs': totalPairs?? 0,
+        'bestTime': bestTime?? 0,
+        'connection': connection,
+        'reload': false,
     });
   }
 
