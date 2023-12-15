@@ -2,9 +2,11 @@
 
 DumDum Card Game is a mobile game developed in Flutter. This mini project is dedicated for me to fully learn and understand Flutter.
 
-Android installer v2 -> https://github.com/DevDumDum/DumDumCardGame/releases/download/Experimental-v2/v2.1.0.apk
+**Game Video Demo v2** -> https://drive.google.com/file/d/1-0b1lHJ17jUaFVfOVzp8VZRQyQNKvst6/view?usp=sharing
 
 <img src="./assets/resources/1.jpg" width=80%>
+
+**Android installer v2** -> https://github.com/DevDumDum/DumDumCardGame/releases/download/Experimental-v2/v2.1.0.apk
 
 Features:
 <ul>
@@ -18,8 +20,6 @@ Features:
       <li>Number of Moves</li>
     </ul>
 </ul>
-
-
 
 <img src="./assets/resources/2.jpg" width=40%>
 
@@ -42,7 +42,5 @@ Coming Soon
   <li>Online Leaderboard</li>
   <li>Personal user account ( for online leaderboard )</li>
 </ul>
-
-Game Video Demo v1 -> https://drive.google.com/file/d/1tgBWUbkVrYhjz4g66BcxhmMnKyH7huI1/view?usp=sharing
 
 Latest Release Notes -> https://github.com/DevDumDum/DumDumCardGame/releases/tag/Experimental-v2
