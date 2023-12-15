@@ -15,7 +15,15 @@ class _ScreenState extends State<Screen> {
 
   Map data = {};
   String? username = '';
-  int highscore = 0;
+  int bestMoves = 0;
+  int totalPairs = 0;
+  int bestTime = 0;
+  int cardRow = 0;
+  int cardCol = 0;
+  Offset loginOffset = Offset.zero;
+  Offset menuOffset = Offset.zero;
+  bool connection = false;
+  bool reload = false;
 
   final controllerText = TextEditingController();
   FocusNode textStatus = FocusNode();
@@ -29,33 +37,61 @@ class _ScreenState extends State<Screen> {
   void saveUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', controllerText.text);
-    await prefs.setInt('highscore', highscore);
+    await prefs.setInt('bestMoves', bestMoves);
+    await prefs.setInt('bestTime', bestTime);
+    await prefs.setInt('totalPairs', totalPairs);
     
     final String? tempname= prefs.getString('username');
-    final int? temphs = prefs.getInt('highscore');
+    final int? tempM = prefs.getInt('bestMoves');
+    final int? tempT = prefs.getInt('bestTime');
+    final int? tempP = prefs.getInt('totalPairs');
     username = data['username'] = tempname;
-    highscore = data['highscore'] = temphs ?? 0;
-    debugPrint('Username created: $tempname | $highscore');
+    bestMoves = data['bestMoves'] = tempM ?? 0;
+    bestTime = data['bestTime'] = tempT ?? 0;
+    totalPairs = data['totalPairs'] = tempP ?? 0;
+    // debugPrint('Data Created: $username | $totalPairs | $bestMoves | $bestTime');
   }
 
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
-    await prefs.remove('highscore');
+    await prefs.remove('bestMoves');
+    await prefs.remove('bestTime');
+    await prefs.remove('totalPairs');
     username = data['username'] = "";
-    highscore = data['highscore'] = 0;
+    bestMoves = data['bestMoves'] = 0;
+    bestTime = data['bestTime'] = 0;
+    totalPairs = data['totalPairs'] = 0;
     // final String? username= prefs.getString('username');
-    debugPrint('Detected: $username | $highscore');
+    // debugPrint('Data Removed');
+    
   }
+
+  Future <void> saveData() async{
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', '$username');
+      await prefs.setInt('bestMoves', bestMoves);
+      await prefs.setInt('bestTime', bestTime);
+      await prefs.setInt('totalPairs', totalPairs);
+      // debugPrint('Data Updated: $username | $totalPairs | $bestMoves | $bestTime');
+    }
+
 
   @override
   Widget build(BuildContext context) {
     data = ModalRoute.of(context)!.settings.arguments as Map;
-    Offset loginOffset = data['loginOffset'];
-    Offset menuOffset = data['menuOffset'];
+    loginOffset = data['loginOffset'];
+    menuOffset = data['menuOffset'];
+    cardRow = data['cardRow'];
+    cardCol = data['cardCol'];
+    connection = data['connection'];
+    reload = data['reload'];
     username = data['username'];
-    highscore = data['highscore'];
-    
+    bestMoves = data['bestMoves'];
+    totalPairs = data['totalPairs'];
+    bestTime = data['bestTime'];
+
+    //change online scoreboard button icon depending if the device is connected to the internet.
     AssetImage scoreboardAccess(){
       if(data['connection'] == true){
         return const AssetImage('assets/images/main_btn/scoreboard.png');
@@ -63,7 +99,6 @@ class _ScreenState extends State<Screen> {
         return const AssetImage('assets/images/main_btn/scoreboard-disable.png');
       }
     }
-    //=== Welcome Back Message ===
 
     return Scaffold(
       body: Container(
@@ -81,7 +116,6 @@ class _ScreenState extends State<Screen> {
           fit: StackFit.passthrough,
           clipBehavior: Clip.antiAlias,
           children: [
-            
             //================= Login Pannel =================
             AnimatedSlide(
               offset: loginOffset,
@@ -177,7 +211,7 @@ class _ScreenState extends State<Screen> {
                 ),
               ),
             ),
-            
+
             //================= Menu Pannel =================
             AnimatedSlide(
               offset: menuOffset,
@@ -197,7 +231,7 @@ class _ScreenState extends State<Screen> {
                       
                       const SizedBox(height: 10,),
                       Text('Hello $username'),
-                      Text('Best Score: $highscore'),
+                      Text('Best Score: $totalPairs pairs | $bestMoves moves | ${bestTime!=0 ? (bestTime/1000).toStringAsFixed(2) : 0}sec'),
 
                       Expanded(
                         child: Column(
@@ -208,23 +242,6 @@ class _ScreenState extends State<Screen> {
                               onFlip: (){
                                 Future.delayed( const Duration(milliseconds: 200),(){
                                   startgame(context);
-                                  // showDialog<void>(
-                                  //   context: context,
-                                  //   builder: (BuildContext context) {
-                                  //     return AlertDialog(
-                                  //       title: const Text('Currently in Development 😉'),
-                                  //       content: const Text('Comming Soon...'),
-                                  //       actions: <Widget>[
-                                  //         TextButton(
-                                  //           onPressed: () {
-                                  //             Navigator.pop(context);
-                                  //           },
-                                  //           child: const Text('OK'),
-                                  //         ),
-                                  //       ],
-                                  //     );
-                                  //   },
-                                  // );
                                 });
                               },
                             ),
@@ -303,22 +320,45 @@ class _ScreenState extends State<Screen> {
               ),
             ),
           ]
-        ),
-      ),
+        )
+      )
     );
   }
+
   Future<void> startgame(BuildContext context) async{
     final result = await Navigator.pushNamed(context, './game', 
       arguments: {
+        'loginOffset': loginOffset,
+        'menuOffset': menuOffset,
+        'cardRow': cardRow,
+        'cardCol': cardCol,
         'username': username,
-        'highscore': highscore
+        'bestMoves': bestMoves,
+        'totalPairs': totalPairs,
+        'bestTime': bestTime,
+        'connection': connection,
+        'reload': false,
       }
-    ) as int;
+    ) as Map;
+    
     if (!mounted) return;
-    if((result.runtimeType) == int){
-      // print("nice");
+    
+    if (result['reload']){
+      startgame(context);
+    } else {
       setState(() {
-        highscore = data['highscore'] = result;
+        loginOffset = data['loginOffset'] = result['loginOffset'];
+        menuOffset = data['menuOffset'] = result['menuOffset'];
+        cardRow = data['cardRow'] = result['cardRow'];
+        cardCol = data['cardCol'] = result['cardCol'];
+        connection = data['connection'] = result['connection'];
+        reload = data['reload'] = result['reload'];
+        username = data['username'] = result['username'];
+        bestMoves = data['bestMoves'] = result['bestMoves'];
+        totalPairs = data['totalPairs'] = result['totalPairs'];
+        bestTime = data['bestTime'] = result['bestTime'];
+        
+        saveData();
       });
     }
 
