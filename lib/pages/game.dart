@@ -80,9 +80,10 @@ class _GameState extends State<Game> {
     }
 
     Future <void> foldCard(cd1, cd2) async {
-      Future.delayed(const Duration(milliseconds: 400), (){
+      Future.delayed(const Duration(milliseconds: 350), (){
         cd2?.currentState?.toggleCard();
         cd1?.currentState?.toggleCard();
+        card1 = card2 = null;
       });
     }
 
@@ -137,14 +138,15 @@ class _GameState extends State<Game> {
     void check() async {
       int curId = cardId.keys.firstWhere((k) => cardId[k] == card1);
       int lastId = cardId.keys.firstWhere((k) => cardId[k] == card2);
+      debugPrint('>>> $curId | $lastId');
       if(cards[curId] != cards[lastId]){
         await foldCard(card1, card2);
       } else {
         solvedCards+=2;
         cardState[curId]=false;
         cardState[lastId]=false;
+        card1 = card2 = null;
       }
-      card1 = card2 = null;
       playerWinCheck();
     }
 
@@ -193,50 +195,55 @@ class _GameState extends State<Game> {
                                       cardState.add(true);
                                       cardId.putIfAbsent(zz, () => GlobalKey<FlipCardState>());
                                       GlobalKey<FlipCardState>? thisCard = cardId[zz];
-                                      return FlipCard(
-                                        key: thisCard,
-                                        flipOnTouch: false,
-                                        speed: 300,
-                                        direction: FlipDirection.HORIZONTAL,
-                                        side: CardSide.FRONT,
-                                        autoFlipDuration: const Duration(milliseconds: 800),
-                                        front: Container(
-                                          padding: const EdgeInsets.symmetric(vertical:10),
-                                          child: AnimatedOpacity(
-                                            opacity: cardState[zz] == true ? 1.0: 0.0,
-                                            duration: const Duration(milliseconds: 500),
-                                            child: Image(
-                                              image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
-                                              fit: BoxFit.fill,
-                                              width: ((MediaQuery.of(context).size.width-50)/cardCol)-20,
+                                      return 
+                                      Opacity(
+                                        opacity: cardState[zz] == null? 0.5 : 1.0,
+                                        child: FlipCard(
+                                          key: thisCard,
+                                          flipOnTouch: false,
+                                          speed: 250,
+                                          direction: FlipDirection.HORIZONTAL,
+                                          side: CardSide.FRONT,
+                                          autoFlipDuration: const Duration(milliseconds: 800),
+                                          front: Container(
+                                            padding: const EdgeInsets.symmetric(vertical:10),
+                                            child: AnimatedOpacity(
+                                              opacity: cardState[zz] == true || cardState[zz] == null? 1.0: 0.0,
+                                              duration: const Duration(milliseconds: 500),
+                                              child: Image(
+                                                image: AssetImage("assets/images/symbols/${cards[zz]}.png"),
+                                                fit: BoxFit.fill,
+                                                width: ((MediaQuery.of(context).size.width-50)/cardCol)-20,
+                                              ),
                                             ),
                                           ),
+                                          back: 
+                                          TextButton(
+                                            style: TextButton.styleFrom(
+                                              padding: EdgeInsets.zero
+                                            ),
+                                            child: Image.asset(
+                                              "assets/images/backgrounds/backCard.png",
+                                              fit: BoxFit.fill,
+                                              height: ((MediaQuery.of(context).size.height-300)/cardCol)-20,
+                                              width: ((MediaQuery.of(context).size.width-40)/cardCol)-20,
+                                            ),
+                                            
+                                            onPressed: () {
+                                              if(card1 == null || (card2 == null && card1 != null)){
+                                                if(card1 == null){
+                                                  card1 = thisCard;
+                                                } else if (card2 == null && card1 != null){
+                                                  card2 = thisCard;
+                                                  check();
+                                                }
+                                                thisCard?.currentState?.toggleCard();
+                                                totalMoves+=1;
+                                                globalKey.currentState?.incrementMove();
+                                              }
+                                            },
+                                          )
                                         ),
-                                        back: 
-                                        TextButton(
-                                          style: TextButton.styleFrom(
-                                            padding: EdgeInsets.zero
-                                          ),
-                                          child: Image.asset(
-                                            "assets/images/backgrounds/backCard.png",
-                                            fit: BoxFit.fill,
-                                            height: ((MediaQuery.of(context).size.height-300)/cardCol)-20,
-                                            width: ((MediaQuery.of(context).size.width-40)/cardCol)-20,
-                                          ),
-                                          
-                                          onPressed: () {
-                                            totalMoves+=1;
-                                            globalKey.currentState?.incrementMove();
-                                            if(card1 == null){
-                                              thisCard?.currentState?.toggleCard();
-                                              card1 = thisCard;
-                                            } else {
-                                              thisCard?.currentState?.toggleCard();
-                                              card2 = thisCard;
-                                              check();
-                                            }
-                                          },
-                                        )
                                       );
                                     }()
                                   ],
