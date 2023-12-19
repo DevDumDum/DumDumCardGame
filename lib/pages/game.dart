@@ -89,7 +89,16 @@ class GameState extends State<Game> {
     }
 
     void timerRunZero(int timeResult){
-      
+      if ( 
+        data['totalPairs'] == 0 || 
+        data['bestMoves'] > totalMoves || 
+        (data['bestMoves'] == totalMoves) // && data['bestTime'] > timeResult
+      ){
+
+        data['bestMoves'] = totalMoves;
+        data['totalPairs'] = solvedCards;
+        data['bestTime'] = timeResult;
+      }
       Future.delayed( const Duration(milliseconds: 400),(){
         showDialog<void>(
           context: context,
@@ -110,15 +119,6 @@ class GameState extends State<Game> {
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
-                        if ( 
-                          data['totalPairs'] == 0 || 
-                          data['bestMoves'] > totalMoves || 
-                          (data['bestMoves'] == totalMoves && data['bestTime'] > timeResult)){
-
-                          data['bestMoves'] = totalMoves;
-                          data['totalPairs'] = solvedCards;
-                          data['bestTime'] = timeResult;
-                        }
                         exitGame();
                         Navigator.pop(context);
                       },
