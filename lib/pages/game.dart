@@ -132,7 +132,7 @@ class GameState extends State<Game> {
     }
 
     void playerWinCheck() {
-      if(cardRow*cardCol == tempSolvedCards && globalKey.currentState!.playerTime < globalKey.currentState!.limit){
+      if(cardRow*cardCol == tempSolvedCards*2 && globalKey.currentState!.playerTime < globalKey.currentState!.limit){
         for(int x = 0; x < cardState.length; x++){
           cardState[x] = true;
         }
@@ -151,11 +151,14 @@ class GameState extends State<Game> {
         });
         
         Future.delayed(const Duration(milliseconds: 700), (){
-          debugPrint('sad');
           globalKey.currentState?.toggleTimer();
         });
         tempSolvedCards = 0;
       }
+    }
+
+    int returnSolvedCards(){
+      return solvedCards;
     }
 
     void check() async {
@@ -166,8 +169,9 @@ class GameState extends State<Game> {
         cardState[lastId]=null;
         await foldCard(card1, card2);
       } else {
-        tempSolvedCards+=2;
-        solvedCards+=2;
+        globalKey.currentState?.increasePlayerTime(1000);
+        tempSolvedCards+=1;
+        solvedCards+=1;
         cardState[curId]=false;
         cardState[lastId]=false;
         card1 = card2 = null;
@@ -214,7 +218,7 @@ class GameState extends State<Game> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    PlayerTimer(key: globalKey, timerRunZero: timerRunZero),
+                    PlayerTimer(key: globalKey, timerRunZero: timerRunZero, solvedCards: returnSolvedCards),
 
                     DisplayCard(
                       key: board,
@@ -251,20 +255,20 @@ class GameState extends State<Game> {
                     iconSize: 50,
                   ),
 
-                  const SizedBox(width: 10),
+                  // const SizedBox(width: 10),
 
-                  IconButton(
-                    icon: Image.asset(
-                      'assets/images/icon_btn/pause.png',
-                      fit: BoxFit.fill,
-                    ),
-                    padding: EdgeInsets.zero,
-                    iconSize: 50,
-                    onPressed: () {
-                      data['reload'] = true;
-                      Navigator.pop(context, data);
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Image.asset(
+                  //     'assets/images/icon_btn/pause.png',
+                  //     fit: BoxFit.fill,
+                  //   ),
+                  //   padding: EdgeInsets.zero,
+                  //   iconSize: 50,
+                  //   onPressed: () {
+                  //     data['reload'] = true;
+                  //     Navigator.pop(context, data);
+                  //   },
+                  // ),
             
                   const SizedBox(width: 10,),
             
@@ -311,8 +315,6 @@ class DisplayCard extends StatefulWidget {
 }
 
 class DisplayCardState extends State<DisplayCard> {
-  @override
-
   void refreshBoard(){
     setState(() {});
   }
@@ -381,9 +383,8 @@ class DisplayCardState extends State<DisplayCard> {
                           ),
                           
                           onPressed: () {
-                            setState(() {
-                              widget.callback(thisCard);
-                            });
+                            widget.callback(thisCard);
+                            refreshBoard();
                           },
                         )
                       );

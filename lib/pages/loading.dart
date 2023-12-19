@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flip_card/flip_card.dart';
@@ -17,10 +19,11 @@ class _LoadingState extends State<Loading> {
 
   void checkUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? username= prefs.getString('username');
-    final int? bestMoves= prefs.getInt('bestMoves');
-    final int? totalPairs= prefs.getInt('totalPairs');
-    final int? bestTime= prefs.getInt('bestsime');
+    final String? dumdataTemp = prefs.getString('DumDumCard'); // [0][username, password, bestMoves, totalPairs, bestTime]
+    final String? username;
+    final int? bestMoves;
+    final int? totalPairs;
+    final int? bestTime;
 
     Offset o1 = Offset.zero;
     Offset o2 = const Offset(1.0,0.0);
@@ -39,12 +42,21 @@ class _LoadingState extends State<Loading> {
       }
     }
 
-    if(username != null){
-      debugPrint('Detected: $username');
+    if(dumdataTemp != null){
+      List dumdata = jsonDecode(dumdataTemp);
+      debugPrint('Detected: $dumdata');
       o1 = const Offset(-1.0,0.0);
       o2 = Offset.zero;
+      username = dumdata[0][0];
+      bestMoves = dumdata[0][2];
+      totalPairs = dumdata[0][3];
+      bestTime = dumdata[0][4];
     } else {
-      debugPrint('No User:{ $username }');
+      username = '';
+      bestMoves = 0;
+      totalPairs = 0;
+      bestTime = 0;
+      debugPrint('No User:{ $dumdataTemp }');
     }
 
     if (!context.mounted) return;
@@ -57,9 +69,9 @@ class _LoadingState extends State<Loading> {
         'cardRow': 4,
         'cardCol': 4,
         'username': username,
-        'bestMoves': bestMoves?? 0,
-        'totalPairs': totalPairs?? 0,
-        'bestTime': bestTime?? 0,
+        'bestMoves': bestMoves,
+        'totalPairs': totalPairs,
+        'bestTime': bestTime,
         'connection': connection,
         'reload': false,
     });

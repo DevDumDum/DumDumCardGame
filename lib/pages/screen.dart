@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dumdumcard/pages/common/bg_pannel.dart';
@@ -36,16 +37,51 @@ class _ScreenState extends State<Screen> {
 
   void saveUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', controllerText.text);
-    await prefs.setInt('bestMoves', bestMoves);
-    await prefs.setInt('bestTime', bestTime);
-    await prefs.setInt('totalPairs', totalPairs);
+    final String? dumdataTemp = prefs.getString('DumDumCard'); // [0][username, password, bestMoves, totalPairs, bestTime]
+    // await prefs.setString('username', controllerText.text);
+    // await prefs.setInt('bestMoves', bestMoves);
+    // await prefs.setInt('bestTime', bestTime);
+    // await prefs.setInt('totalPairs', totalPairs);
     
-    final String? tempname= prefs.getString('username');
-    final int? tempM = prefs.getInt('bestMoves');
-    final int? tempT = prefs.getInt('bestTime');
-    final int? tempP = prefs.getInt('totalPairs');
-    username = data['username'] = tempname;
+    final String? tempName;
+    final int? tempM;
+    final int? tempT;
+    final int? tempP;
+
+    if(dumdataTemp != null){
+      List dumdata = jsonDecode(dumdataTemp);
+      int x;
+      bool status = false;
+      for(x = 0; x < dumdata.length; x++){
+        if(dumdata[x][0] == controllerText.text){
+          status = true;
+          break;
+        }
+      }
+
+      if(status){
+        tempName = dumdata[x][0];
+        tempM = dumdata[x][2];
+        tempP = dumdata[x][3];
+        tempT = dumdata[x][4];
+      } else {
+        dumdata.add([controllerText.text, '', 0, 0, 0]);
+        tempName = controllerText.text;
+        tempM = 0;
+        tempP = 0;
+        tempT = 0;
+        await prefs.setString('DumDumCard', jsonEncode(dumdata));
+      }
+      debugPrint('!Detected: $dumdata');
+    } else {
+      tempName = controllerText.text;
+      tempM = 0;
+      tempP = 0;
+      tempT = 0;
+      debugPrint('No User:{ $dumdataTemp }');
+    }
+
+    username = data['username'] = tempName;
     bestMoves = data['bestMoves'] = tempM ?? 0;
     bestTime = data['bestTime'] = tempT ?? 0;
     totalPairs = data['totalPairs'] = tempP ?? 0;
@@ -53,11 +89,11 @@ class _ScreenState extends State<Screen> {
   }
 
   void removeUser() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('username');
-    await prefs.remove('bestMoves');
-    await prefs.remove('bestTime');
-    await prefs.remove('totalPairs');
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // await prefs.remove('username');
+    // await prefs.remove('bestMoves');
+    // await prefs.remove('bestTime');
+    // await prefs.remove('totalPairs');
     username = data['username'] = "";
     bestMoves = data['bestMoves'] = 0;
     bestTime = data['bestTime'] = 0;
@@ -69,10 +105,34 @@ class _ScreenState extends State<Screen> {
 
   Future <void> saveData() async{
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', '$username');
-      await prefs.setInt('bestMoves', bestMoves);
-      await prefs.setInt('bestTime', bestTime);
-      await prefs.setInt('totalPairs', totalPairs);
+      final String? dumdataTemp = prefs.getString('DumDumCard'); //[0][username, password, bestMoves, totalPairs, bestTime]
+      debugPrint('> $dumdataTemp');
+      if(dumdataTemp != null){
+        List dumdata = jsonDecode(dumdataTemp);
+        
+        bool status = false;
+        int x;
+        for(x = 0; x < dumdata.length; x++){
+          debugPrint('0; $status | ${dumdata[x][0]}');
+          if(dumdata[x][0] == username){
+            status = true;
+            break;
+          }
+        }
+        debugPrint('1; $status | ${dumdata[x]}');
+        if(status){
+          dumdata[x][2] = bestMoves;
+          dumdata[x][3] = totalPairs;
+          dumdata[x][4] = bestTime;
+          await prefs.setString('DumDumCard', jsonEncode(dumdata));
+        }
+      } else {
+        List tempData = [[username, '', bestMoves, totalPairs, bestTime]];
+        debugPrint('2: $tempData');
+        await prefs.setString('DumDumCard', jsonEncode(tempData));
+      }
+      final String? dumdataTemp2 = prefs.getString('DumDumCard'); //[0][username, password, bestMoves, totalPairs, bestTime]
+      debugPrint('>> $dumdataTemp2');
       // debugPrint('Data Updated: $username | $totalPairs | $bestMoves | $bestTime');
     }
 
@@ -225,7 +285,7 @@ class _ScreenState extends State<Screen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 40,),
+                      const SizedBox(height: 30,),
                       Image.asset('assets/images/labels/title1.png', fit: BoxFit.fitWidth,),
                       Image.asset('assets/images/labels/title2.png', width: 150),
                       
