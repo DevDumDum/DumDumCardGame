@@ -5,14 +5,15 @@ class PlayerTimer extends StatefulWidget {
   // const PlayerTimer({super.key, required this.builder, this.methodFromParent});
   // final CustomBuilder builder;
   // final Function(int val)? methodFromParent;
-  const PlayerTimer({super.key});
+  const PlayerTimer({super.key, required this.timerRunZero});
+  final Function timerRunZero;
 
   @override
   State<PlayerTimer> createState() => PlayerTimerState();
 }
 
 class PlayerTimerState extends State<PlayerTimer> {
-  int limit = 60000;
+  int limit = 30000;
   int playerTime = 0;
   int pMove = 0;
   bool timerStatus = true;
@@ -25,7 +26,11 @@ class PlayerTimerState extends State<PlayerTimer> {
 
   void startTimer() {
     Timer.periodic(const Duration(milliseconds: 1), (timer) {
-      if ((playerTime == limit) || timerStatus == false){
+      if(playerTime == limit){
+        timer.cancel();
+        widget.timerRunZero(playerTime);
+      }
+      if (timerStatus == false){
         timer.cancel();
       } else {
         setState(() {
@@ -35,8 +40,11 @@ class PlayerTimerState extends State<PlayerTimer> {
     });
   }
 
-  int stopTimer() {
+  int toggleTimer() {
     timerStatus=!timerStatus;
+    if(timerStatus){
+      startTimer();
+    }
     return playerTime;
   }
 
@@ -52,6 +60,10 @@ class PlayerTimerState extends State<PlayerTimer> {
     if(!timerStatus) {
       startTimer();
     }
+  }
+
+  void clearMove(){
+    pMove = 0;
   }
 
   @override

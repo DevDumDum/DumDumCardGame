@@ -231,7 +231,8 @@ class _ScreenState extends State<Screen> {
                       
                       const SizedBox(height: 10,),
                       Text('Hello $username'),
-                      Text('Best Score: $totalPairs pairs | $bestMoves moves | ${bestTime!=0 ? (bestTime/1000).toStringAsFixed(2) : 0}sec'),
+                      Text('Best Score: $totalPairs pairs | $bestMoves moves'),
+                      // Text('Best Score: $totalPairs pairs | $bestMoves moves | ${bestTime!=0 ? (bestTime/1000).toStringAsFixed(2) : 0}sec'),
 
                       Expanded(
                         child: Column(
