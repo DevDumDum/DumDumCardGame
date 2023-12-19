@@ -89,17 +89,14 @@ class GameState extends State<Game> {
     }
 
     void timerRunZero(int timeResult){
-      if ( 
-        data['totalPairs'] == 0 || 
-        data['bestMoves'] > totalMoves || 
-        (data['bestMoves'] == totalMoves) // && data['bestTime'] > timeResult
-      ){
-
-        data['bestMoves'] = totalMoves;
-        data['totalPairs'] = solvedCards;
-        data['bestTime'] = timeResult;
-      }
       // Future.delayed( const Duration(milliseconds: 200),(){
+        bool scoreStatus = false;
+        if ( data['totalPairs'] < solvedCards || (data['totalPairs'] <= solvedCards && data['bestMoves'] >= totalMoves)){
+          data['bestMoves'] = totalMoves;
+          data['totalPairs'] = solvedCards;
+          data['bestTime'] = timeResult;
+          scoreStatus = true;
+        }
         showDialog<void>(
           barrierDismissible: false,
           context: context,
@@ -108,7 +105,7 @@ class GameState extends State<Game> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 280),
                 child: AlertDialog(
-                  title: Text((data['bestMoves'] > totalMoves || (data['bestMoves'] == totalMoves))? 'New HighScore!' : 'Result'),
+                  title: Text(scoreStatus? 'New HighScore!' : 'Result'),
                   content: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
