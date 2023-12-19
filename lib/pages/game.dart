@@ -99,8 +99,9 @@ class GameState extends State<Game> {
         data['totalPairs'] = solvedCards;
         data['bestTime'] = timeResult;
       }
-      Future.delayed( const Duration(milliseconds: 400),(){
+      // Future.delayed( const Duration(milliseconds: 200),(){
         showDialog<void>(
+          barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
             return  Center(
@@ -130,7 +131,7 @@ class GameState extends State<Game> {
             );
           },
         );
-      });
+      // });
     }
 
     void playerWinCheck() {
