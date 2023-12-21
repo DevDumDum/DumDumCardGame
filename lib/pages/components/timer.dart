@@ -97,7 +97,7 @@ class PlayerTimerState extends State<PlayerTimer> {
     return Column(
       children: [Text(
         'Move: $pMove | Solved: $solvedCards | Time: ${(playerTime/1000).toStringAsFixed(2)}',
-        style: const TextStyle(fontSize: 17),
+        style: const TextStyle(fontSize: 15),
       ),
       
       SizedBox(
