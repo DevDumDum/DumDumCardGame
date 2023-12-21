@@ -2,7 +2,7 @@
 
 DumDum Card Game is a mobile game developed in Flutter. This mini project is dedicated for me to fully learn and understand Flutter.
 
-**Game Video Demo v2** -> https://drive.google.com/file/d/1-0b1lHJ17jUaFVfOVzp8VZRQyQNKvst6/view?usp=sharing
+**Game Video Demo v2** -> https://drive.google.com/file/d/102ZB8otDD7vPvnAW2fb4L9kJXlLMKYvk/view?usp=sharing
 
 <img src="./assets/resources/1.jpg" width=80%>
 
